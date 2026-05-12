@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vite/
+.turbo/
+coverage/
+.next/
+.cache/
+
+# Imágenes raw descargadas durante extract-logos (los .png procesados sí van al repo)
+/tmp/lba-logos/

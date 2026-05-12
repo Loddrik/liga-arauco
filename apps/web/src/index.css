@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Archivo', system-ui, sans-serif;
+  background: theme('colors.paper.DEFAULT');
+  color: theme('colors.ink.DEFAULT');
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografía display: condensed all-caps para titulares y scores */
+.font-display {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Label tipo broadcast: uppercase chiquito con tracking */
+.eyebrow {
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+/* Selección de texto en tono cancha */
+::selection {
+  background: theme('colors.court.DEFAULT');
+  color: white;
+}
+
+/* Scrollbar discreta */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: theme('colors.ink.300');
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.ink.500');
+}
+
+/* Grain sutil de fondo en el paper, da textura editorial */
+.bg-paper-grain {
+  background-color: theme('colors.paper.DEFAULT');
+  background-image: radial-gradient(rgba(10, 10, 10, 0.025) 1px, transparent 1px);
+  background-size: 4px 4px;
+}

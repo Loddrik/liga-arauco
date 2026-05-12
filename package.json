@@ -1,0 +1,15 @@
+{
+  "name": "liga-arauco",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "scripts": {
+    "dev:web": "pnpm --filter @liga/web dev",
+    "dev:api": "pnpm --filter @liga/api start:dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

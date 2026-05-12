@@ -1,0 +1,91 @@
+// Liga de Básquetbol Arauco 2026 — schema
+// Standings se calculan derivados de Match, no se persisten.
+
+generator client {
+  provider      = "prisma-client-js"
+  // native = la máquina donde corre `prisma generate` (dev). Los targets adicionales
+  // permiten que el cliente funcione en alpine/musl (runtime Docker) sin re-generar.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoundPhase {
+  REGULAR
+  SEMI
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  PLAYED
+  POSTPONED
+}
+
+model Team {
+  id              String  @id @default(cuid())
+  slug            String  @unique
+  name            String
+  shortName       String
+  instagramHandle String?
+  logoUrl         String?
+  logoSvgUrl      String?
+  primaryColor    String  @default("#0F2A4A")
+  secondaryColor  String?
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Round {
+  id      String     @id @default(cuid())
+  number  Int        @unique
+  label   String
+  phase   RoundPhase
+  date    DateTime
+
+  matches Match[]
+}
+
+model Match {
+  id     String @id @default(cuid())
+  number Int    @unique
+
+  roundId String
+  round   Round  @relation(fields: [roundId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime
+
+  homeTeamId String?
+  awayTeamId String?
+  homeTeam   Team?   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team?   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+
+  homePlaceholder String?
+  awayPlaceholder String?
+
+  homeScore Int?
+  awayScore Int?
+
+  status MatchStatus @default(SCHEDULED)
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([roundId])
+  @@index([scheduledAt])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
