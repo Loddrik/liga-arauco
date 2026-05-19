@@ -44,6 +44,7 @@ export function AdminLayout() {
           <nav className="flex items-center gap-1">
             <AdminNavItem to="/admin">Partidos</AdminNavItem>
             <AdminNavItem to="/admin/equipos">Equipos</AdminNavItem>
+            <AdminNavItem to="/admin/nm-sync">NM Sync</AdminNavItem>
             <Link to="/" className="px-3 py-2 text-sm text-white/70 hover:text-white">
               Sitio público ↗
             </Link>
