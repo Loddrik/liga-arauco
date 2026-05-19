@@ -14,8 +14,14 @@ RUN pnpm install --frozen-lockfile
 
 # ---------- build ----------
 FROM deps AS build
+# Vite inlinea estas vars en el bundle al hacer `pnpm build`. Tienen que
+# llegar como ARG/ENV durante el build de Docker — las service variables de
+# Railway en runtime NO se inyectan al bundle (es código estático servido
+# por nginx después).
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_NM_BASE_URL
+ENV VITE_NM_BASE_URL=$VITE_NM_BASE_URL
 COPY packages/shared packages/shared
 COPY apps/web apps/web
 RUN pnpm --filter @liga/shared build
