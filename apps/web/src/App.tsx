@@ -6,10 +6,12 @@ import Home from './pages/Home';
 import Fixture from './pages/Fixture';
 import Standings from './pages/Standings';
 import TeamDetail from './pages/TeamDetail';
+import MatchDetail from './pages/MatchDetail';
 import Login from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import MatchEditor from './pages/admin/MatchEditor';
 import TeamsAdmin from './pages/admin/TeamsAdmin';
+import NmSync from './pages/admin/NmSync';
 
 export default function App() {
   return (
@@ -21,6 +23,7 @@ export default function App() {
           <Route path="/fixture" element={<Fixture />} />
           <Route path="/tabla" element={<Standings />} />
           <Route path="/equipos/:slug" element={<TeamDetail />} />
+          <Route path="/partidos/:id" element={<MatchDetail />} />
         </Route>
 
         {/* Admin */}
@@ -35,6 +38,7 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/partidos/:id" element={<MatchEditor />} />
           <Route path="/admin/equipos" element={<TeamsAdmin />} />
+          <Route path="/admin/nm-sync" element={<NmSync />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
