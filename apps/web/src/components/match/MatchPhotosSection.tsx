@@ -14,6 +14,12 @@ interface PhotosConfig {
   qrUrl: string | null;
 }
 
+/** Append a `tab` param to the NM embed URL preserving the existing query. */
+function withTab(embedUrl: string, tab: 'gallery' | 'upload'): string {
+  const sep = embedUrl.includes('?') ? '&' : '?';
+  return `${embedUrl}${sep}tab=${tab}`;
+}
+
 interface Props {
   matchId: string;
 }
@@ -119,13 +125,17 @@ export function MatchPhotosSection({ matchId }: Props) {
           onOpen={() => setShowUploader(true)}
         />
 
-        {/* Card 2: Galería embebida */}
-        <GalleryCard embedUrl={data.embedUrl} height={iframeHeight} />
+        {/* Card 2: Galería embebida — forzamos tab=gallery para evitar que
+            el iframe muestre el formulario de upload duplicado cuando hay 0 fotos. */}
+        <GalleryCard
+          embedUrl={withTab(data.embedUrl, 'gallery')}
+          height={iframeHeight}
+        />
       </div>
 
       {showUploader && (
         <UploaderModal
-          embedUrl={data.embedUrl}
+          embedUrl={withTab(data.embedUrl, 'upload')}
           onClose={() => setShowUploader(false)}
         />
       )}
@@ -213,7 +223,15 @@ function UploaderModal({ embedUrl, onClose }: UploaderModalProps) {
       if (e.key === 'Escape') onClose();
     }
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    // Bloquea scroll del body mientras el modal está abierto (especialmente en
+    // mobile, donde el iframe ocupa toda la pantalla y queremos que el touch
+    // scroll vaya al iframe, no al fondo).
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [onClose]);
 
   return (
@@ -221,19 +239,21 @@ function UploaderModal({ embedUrl, onClose }: UploaderModalProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Subir fotos"
-      className="fixed inset-0 z-40 bg-ink/70 flex items-center justify-center p-4"
+      // Mobile: cubre toda la pantalla sin padding ni backdrop visible.
+      // Desktop (sm+): vuelve al modal centrado con backdrop oscuro.
+      className="fixed inset-0 z-40 bg-paper-50 sm:bg-ink/70 sm:flex sm:items-center sm:justify-center sm:p-4"
       onClick={e => {
         if (e.target === dialogRef.current) onClose();
       }}
       ref={dialogRef}
     >
-      <div className="bg-paper-50 w-full max-w-3xl max-h-[90vh] flex flex-col">
-        <header className="flex items-center justify-between border-b border-ink-100 p-3">
-          <span className="eyebrow">Subir fotos del partido</span>
+      <div className="bg-paper-50 w-full h-full sm:h-auto sm:max-w-3xl sm:max-h-[90vh] flex flex-col">
+        <header className="flex items-center justify-between border-b border-ink-100 px-3 py-2.5 shrink-0">
+          <span className="eyebrow truncate">Subir fotos del partido</span>
           <button
             type="button"
             onClick={onClose}
-            className="text-ink-500 hover:text-ink text-xl leading-none px-2"
+            className="text-ink-500 hover:text-ink text-2xl leading-none px-3 py-1 -mr-2"
             aria-label="Cerrar"
           >
             ×
@@ -242,7 +262,10 @@ function UploaderModal({ embedUrl, onClose }: UploaderModalProps) {
         <iframe
           src={embedUrl}
           title="Uploader de fotos"
-          style={{ width: '100%', height: '80vh', border: 'none' }}
+          // flex-1 hace que el iframe absorba el espacio restante. En mobile
+          // = altura completa menos header. En desktop = hasta 90vh (limitado
+          // por el contenedor). Cero scroll wrapper extra.
+          className="flex-1 w-full border-0 min-h-0"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         />
       </div>
