@@ -93,6 +93,14 @@ export function MatchCard({ match, showRound = false, variant = 'default', class
           compact={isCompact}
         />
       </div>
+
+      {/* Footer link al detalle del partido (galería de fotos NM) */}
+      <Link
+        to={`/partidos/${match.id}`}
+        className="block border-t border-ink-100 px-4 py-2 eyebrow text-ink-500 hover:text-court hover:bg-paper-100 transition-colors text-center"
+      >
+        Ver partido · Fotos →
+      </Link>
     </article>
   );
 }

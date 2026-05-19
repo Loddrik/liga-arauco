@@ -76,11 +76,20 @@ model Match {
   status MatchStatus @default(SCHEDULED)
   notes  String?
 
+  // Nuestro Momento integration (spec 2026-05-004).
+  // Cada partido se sincroniza como un "evento" en NM para alojar la galería
+  // de fotos. nmEventId se setea tras la primera sincronización exitosa;
+  // mientras sea null, el partido aún no tiene galería.
+  nmEventId   String?   @map("nm_event_id")
+  nmEventSlug String?   @map("nm_event_slug")
+  nmSyncedAt  DateTime? @map("nm_synced_at")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([roundId])
   @@index([scheduledAt])
+  @@index([nmEventId])
 }
 
 model AdminUser {
