@@ -3,6 +3,7 @@ import { useUpcoming, useRecent, useStandings } from '@/lib/api';
 import { MatchCard } from '@/components/MatchCard';
 import { StandingsTable } from '@/components/StandingsTable';
 import { TeamBadge } from '@/components/TeamBadge';
+import { PhotosAnnouncement } from '@/components/PhotosAnnouncement';
 import type { MatchDto } from '@liga/shared';
 
 function SectionHeader({ children, link }: { children: React.ReactNode; link?: { to: string; label: string } }) {
@@ -107,7 +108,11 @@ export default function Home() {
   const restOfUpcoming = upcoming.data?.slice(1) ?? [];
 
   return (
-    <div className="space-y-12 animate-fade-up">
+    <div className="space-y-6 animate-fade-up">
+      {/* Anuncio: fotos del partido vía Nuestro Momento */}
+      <PhotosAnnouncement />
+
+      <div className="space-y-12">
       {/* Hero */}
       {heroMatch ? (
         <HeroNextGame match={heroMatch} />
@@ -161,6 +166,7 @@ export default function Home() {
           Los 4 primeros clasifican a semifinales · Fecha 11, 12 julio
         </p>
       </section>
+      </div>
     </div>
   );
 }
