@@ -58,12 +58,12 @@ export function PhotosAnnouncement() {
             Fotos del partido · ahora abierto
           </div>
           <h2 className="font-display text-2xl leading-[0.92] tracking-wide sm:text-3xl md:text-4xl">
-            Subí tus fotos de cada partido,
+            Sube tus fotos de cada partido,
             <br className="hidden sm:block" />
-            <span className="text-gold"> miralas con la liga.</span>
+            <span className="text-gold"> míralas con la liga.</span>
           </h2>
           <p className="mt-2 text-sm text-paper-50/85 max-w-prose">
-            Escaneá el QR del partido o entrá desde la web. Sin app, sin
+            Escanea el QR del partido o entra desde la web. Sin app, sin
             crear cuenta. Las fotos quedan disponibles para todos.
           </p>
         </div>
