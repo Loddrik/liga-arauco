@@ -1,5 +1,5 @@
-import type { Team, Match, Round } from '@prisma/client';
-import type { TeamDto, MatchDto, RoundDto } from '@liga/shared';
+import type { Team, Match, Round, Player } from '@prisma/client';
+import type { TeamDto, MatchDto, RoundDto, PlayerPublicDto, PlayerAdminDto } from '@liga/shared';
 
 export function mapTeam(t: Team): TeamDto {
   return {
@@ -50,5 +50,22 @@ export function mapRound(r: RoundWithMatches): RoundDto {
     phase: r.phase,
     date: r.date.toISOString(),
     matches: r.matches.sort((a, b) => a.number - b.number).map(mapMatch),
+  };
+}
+
+export function mapPlayerPublic(p: Player): PlayerPublicDto {
+  return {
+    id: p.id,
+    name: p.name,
+    jersey: p.jersey,
+    position: p.position,
+  };
+}
+
+export function mapPlayerAdmin(p: Player): PlayerAdminDto {
+  return {
+    ...mapPlayerPublic(p),
+    rut: p.rut,
+    teamId: p.teamId,
   };
 }

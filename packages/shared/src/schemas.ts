@@ -32,3 +32,18 @@ export const assignPlayoffSchema = z.object({
   awayTeamId: z.string().nullable(),
 });
 export type AssignPlayoffInput = z.infer<typeof assignPlayoffSchema>;
+
+// RUT chileno: 1+ dígitos, opcionalmente con puntos separadores, guión, y dígito
+// verificador (0-9 o K/k). Aceptamos el formato visible en el docx oficial.
+const RUT_PATTERN = /^[\d.]+-[\dkK]$/;
+
+export const createPlayerSchema = z.object({
+  name: z.string().min(1).max(120).trim(),
+  rut: z.string().regex(RUT_PATTERN, 'Formato esperado: 12.345.678-9'),
+  jersey: z.number().int().min(0).max(99).nullable().optional(),
+  position: z.string().max(40).nullable().optional(),
+});
+export type CreatePlayerInput = z.infer<typeof createPlayerSchema>;
+
+export const updatePlayerSchema = createPlayerSchema.partial();
+export type UpdatePlayerInput = z.infer<typeof updatePlayerSchema>;

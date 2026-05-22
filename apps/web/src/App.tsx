@@ -11,6 +11,7 @@ import Login from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import MatchEditor from './pages/admin/MatchEditor';
 import TeamsAdmin from './pages/admin/TeamsAdmin';
+import RosterAdmin from './pages/admin/RosterAdmin';
 import NmSync from './pages/admin/NmSync';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/partidos/:id" element={<MatchEditor />} />
           <Route path="/admin/equipos" element={<TeamsAdmin />} />
+          <Route path="/admin/equipos/:slug/nomina" element={<RosterAdmin />} />
           <Route path="/admin/nm-sync" element={<NmSync />} />
         </Route>
 

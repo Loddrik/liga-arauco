@@ -8,6 +8,7 @@ import { StandingsModule } from './standings/standings.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
 import { NmModule } from './nm/nm.module';
+import { PlayersModule } from './players/players.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { NmModule } from './nm/nm.module';
     RoundsModule,
     MatchesModule,
     StandingsModule,
+    PlayersModule,
     AuthModule,
     AdminModule,
   ],

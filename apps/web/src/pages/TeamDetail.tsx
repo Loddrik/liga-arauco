@@ -1,12 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
-import { useTeam, useStandings } from '@/lib/api';
+import { useTeam, useStandings, useTeamRoster } from '@/lib/api';
 import { MatchCard } from '@/components/MatchCard';
 import { TeamBadge } from '@/components/TeamBadge';
+import { RosterSection } from '@/components/RosterSection';
 
 export default function TeamDetail() {
   const { slug = '' } = useParams<{ slug: string }>();
   const { data, isLoading, isError } = useTeam(slug);
   const { data: standings } = useStandings();
+  const { data: roster, isLoading: rosterLoading } = useTeamRoster(slug);
 
   if (isError) {
     return (
@@ -134,6 +136,23 @@ export default function TeamDetail() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* Plantel */}
+      <section>
+        <header className="flex items-end justify-between mb-4 border-b border-ink-100 pb-2">
+          <h2 className="font-display text-3xl sm:text-4xl tracking-wide leading-none">
+            Plantel
+          </h2>
+          <span className="eyebrow text-ink-500">
+            {roster ? `${roster.length} jugadores` : '—'}
+          </span>
+        </header>
+        <RosterSection
+          players={roster ?? []}
+          isLoading={rosterLoading}
+          primaryColor={team.primaryColor}
+        />
       </section>
     </div>
   );

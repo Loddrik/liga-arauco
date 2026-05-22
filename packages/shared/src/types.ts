@@ -47,3 +47,17 @@ export interface StandingRowDto {
   pointDifferential: number;
   leaguePoints: number;
 }
+
+/** Vista pública del jugador (sin RUT). */
+export interface PlayerPublicDto {
+  id: string;
+  name: string;
+  jersey: number | null;
+  position: string | null;
+}
+
+/** Vista admin del jugador (incluye RUT). */
+export interface PlayerAdminDto extends PlayerPublicDto {
+  rut: string;
+  teamId: string;
+}

@@ -39,9 +39,29 @@ model Team {
 
   homeMatches Match[] @relation("HomeTeam")
   awayMatches Match[] @relation("AwayTeam")
+  players     Player[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Player {
+  id     String @id @default(cuid())
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  // Datos del jugador. RUT es único globalmente (un jugador no puede estar
+  // en dos equipos a la vez), jersey opcional pero único por equipo.
+  name     String
+  rut      String  @unique
+  jersey   Int?
+  position String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teamId])
+  @@unique([teamId, jersey])
 }
 
 model Round {

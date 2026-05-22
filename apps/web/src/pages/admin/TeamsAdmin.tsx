@@ -1,4 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { useTeams } from '@/lib/api';
 import { useUpdateTeam } from '@/lib/admin-api';
 import { TeamBadge } from '@/components/TeamBadge';
@@ -89,7 +90,13 @@ function TeamForm({ team }: { team: TeamDto }) {
         </label>
       </div>
 
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex items-center justify-between">
+        <Link
+          to={`/admin/equipos/${team.slug}/nomina`}
+          className="text-xs text-brand hover:underline"
+        >
+          Nómina del equipo →
+        </Link>
         <button
           type="submit"
           disabled={!dirty || updateTeam.isPending}

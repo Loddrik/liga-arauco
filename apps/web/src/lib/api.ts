@@ -1,5 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import type { TeamDto, MatchDto, RoundDto, StandingRowDto } from '@liga/shared';
+import type {
+  TeamDto,
+  MatchDto,
+  RoundDto,
+  StandingRowDto,
+  PlayerPublicDto,
+} from '@liga/shared';
 import { http } from './http';
 
 async function get<T>(url: string): Promise<T> {
@@ -39,4 +45,12 @@ export function useRecent(limit = 6) {
 
 export function useStandings() {
   return useQuery({ queryKey: ['standings'], queryFn: () => get<StandingRowDto[]>('/standings') });
+}
+
+export function useTeamRoster(slug: string) {
+  return useQuery({
+    queryKey: ['teams', slug, 'players'],
+    queryFn: () => get<PlayerPublicDto[]>(`/teams/${slug}/players`),
+    enabled: !!slug,
+  });
 }
