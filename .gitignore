@@ -15,3 +15,7 @@ coverage/
 
 # Imágenes raw descargadas durante extract-logos (los .png procesados sí van al repo)
 /tmp/lba-logos/
+
+# Originales entregados por la organización (logos JPEG, nóminas .docx, fotos de equipo).
+# Los logos procesados sí van al repo en apps/web/public/teams/.
+file-space/
