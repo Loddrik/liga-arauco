@@ -3,6 +3,15 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAdminMatches, useUpdateMatch } from '@/lib/admin-api';
 import type { MatchStatus, UpdateMatchInput } from '@liga/shared';
 import { TeamBadge } from '@/components/TeamBadge';
+import { isTimeTbd } from '@/lib/match-time';
+
+function formatScheduledForAdmin(iso: string) {
+  const d = new Date(iso);
+  const date = d.toLocaleDateString('es-CL', { weekday: 'short', day: '2-digit', month: 'long' });
+  if (isTimeTbd(d)) return `${date} · hora por definir`;
+  const time = d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${date} · ${time}`;
+}
 
 export default function MatchEditor() {
   const { id = '' } = useParams<{ id: string }>();
@@ -61,7 +70,7 @@ export default function MatchEditor() {
       <Link to="/admin" className="text-sm text-brand hover:underline">← Volver al listado</Link>
       <header>
         <h1 className="text-2xl font-bold text-brand">Editar partido #{match.number}</h1>
-        <p className="text-sm text-slate-500">Fecha {match.roundNumber} · {new Date(match.scheduledAt).toLocaleString('es-CL')}</p>
+        <p className="text-sm text-slate-500">Fecha {match.roundNumber} · {formatScheduledForAdmin(match.scheduledAt)}</p>
       </header>
 
       <form onSubmit={onSubmit} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 space-y-5">

@@ -5,6 +5,7 @@ import { StandingsTable } from '@/components/StandingsTable';
 import { TeamBadge } from '@/components/TeamBadge';
 import { PhotosAnnouncement } from '@/components/PhotosAnnouncement';
 import type { MatchDto } from '@liga/shared';
+import { matchTimeOrTbd } from '@/lib/match-time';
 
 function SectionHeader({ children, link }: { children: React.ReactNode; link?: { to: string; label: string } }) {
   return (
@@ -30,7 +31,7 @@ function HeroNextGame({ match }: { match: MatchDto }) {
     day: '2-digit',
     month: 'long',
   });
-  const time = dt.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const time = matchTimeOrTbd(dt);
 
   return (
     <Link

@@ -5,6 +5,7 @@ import { http } from '@/lib/http';
 import { TeamBadge } from '@/components/TeamBadge';
 import { cn } from '@/lib/cn';
 import type { MatchDto } from '@liga/shared';
+import { isTimeTbd } from '@/lib/match-time';
 
 // Admin extiende MatchDto con campos NM (no están en MatchDto público).
 type AdminMatch = MatchDto & {
@@ -14,14 +15,15 @@ type AdminMatch = MatchDto & {
 };
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleString('es-CL', {
+  const d = new Date(iso);
+  const dateStr = d.toLocaleDateString('es-CL', {
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
   });
+  if (isTimeTbd(d)) return `${dateStr} · TBD`;
+  const time = d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${dateStr} ${time}`;
 }
 
 const STATUS_LABEL = {

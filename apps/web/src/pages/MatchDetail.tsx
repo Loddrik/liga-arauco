@@ -4,6 +4,7 @@ import { useRounds } from '@/lib/api';
 import { TeamBadge } from '@/components/TeamBadge';
 import { MatchPhotosSection } from '@/components/match/MatchPhotosSection';
 import { cn } from '@/lib/cn';
+import { matchTimeOrTbd } from '@/lib/match-time';
 
 function formatDateTime(iso: string) {
   const d = new Date(iso);
@@ -13,11 +14,7 @@ function formatDateTime(iso: string) {
     month: 'long',
     year: 'numeric',
   });
-  const hora = d.toLocaleTimeString('es-CL', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
+  const hora = matchTimeOrTbd(d);
   return { fecha, hora };
 }
 

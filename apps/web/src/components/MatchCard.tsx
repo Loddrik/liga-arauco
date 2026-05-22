@@ -2,6 +2,7 @@ import type { MatchDto } from '@liga/shared';
 import { Link } from 'react-router-dom';
 import { TeamBadge } from './TeamBadge';
 import { cn } from '@/lib/cn';
+import { isTimeTbd, matchTimeOrTbd } from '@/lib/match-time';
 
 interface Props {
   match: MatchDto;
@@ -19,8 +20,9 @@ function formatDateTime(iso: string) {
       month: 'short',
     })
     .replace('.', '');
-  const hora = d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
-  return { fecha, hora };
+  const hora = matchTimeOrTbd(d);
+  const tbd = isTimeTbd(d);
+  return { fecha, hora, tbd };
 }
 
 const STATUS_META = {
@@ -30,7 +32,7 @@ const STATUS_META = {
 } as const;
 
 export function MatchCard({ match, showRound = false, variant = 'default', className }: Props) {
-  const { fecha, hora } = formatDateTime(match.scheduledAt);
+  const { fecha, hora, tbd } = formatDateTime(match.scheduledAt);
   const played = match.status === 'PLAYED';
   const homeWon = played && match.homeScore != null && match.awayScore != null && match.homeScore > match.awayScore;
   const awayWon = played && match.homeScore != null && match.awayScore != null && match.awayScore > match.homeScore;
@@ -67,7 +69,7 @@ export function MatchCard({ match, showRound = false, variant = 'default', class
               match.status === 'SCHEDULED' && 'text-ink-300',
             )}
           >
-            {status.label ?? `${hora}`}
+            {status.label ?? (tbd ? 'TBD' : hora)}
           </span>
         </div>
       </header>

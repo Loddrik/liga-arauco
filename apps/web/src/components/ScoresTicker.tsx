@@ -3,6 +3,7 @@ import type { MatchDto } from '@liga/shared';
 import { useRecent, useUpcoming } from '@/lib/api';
 import { TeamBadge } from './TeamBadge';
 import { cn } from '@/lib/cn';
+import { matchTimeOrTbd } from '@/lib/match-time';
 
 function formatMini(iso: string) {
   const d = new Date(iso);
@@ -18,7 +19,7 @@ function MiniGame({ m, kind }: { m: MatchDto; kind: 'past' | 'upcoming' }) {
   const played = m.status === 'PLAYED';
   const homeWon = played && m.homeScore! > m.awayScore!;
   const awayWon = played && m.awayScore! > m.homeScore!;
-  const time = new Date(m.scheduledAt).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+  const time = matchTimeOrTbd(m.scheduledAt, 'TBD');
 
   return (
     <Link
