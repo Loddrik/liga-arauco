@@ -9,6 +9,7 @@ export interface TeamDto {
   instagramHandle: string | null;
   logoUrl: string | null;
   logoSvgUrl: string | null;
+  coverPhotoUrl: string | null;
   primaryColor: string;
   secondaryColor: string | null;
 }

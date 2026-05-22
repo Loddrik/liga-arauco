@@ -32,14 +32,31 @@ export default function TeamDetail() {
 
   return (
     <div className="animate-fade-up space-y-12 -mt-8 sm:-mt-10">
-      {/* Hero con color del equipo */}
+      {/* Hero con foto de portada (si existe) + tinte del color del equipo */}
       <header className="relative text-paper-50 overflow-hidden -mx-4 px-4 sm:-mx-0 sm:px-0">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(120deg, ${team.primaryColor} 0%, ${team.primaryColor}DD 60%, #0A0A0A 100%)`,
-          }}
-        />
+        {team.coverPhotoUrl ? (
+          <>
+            <img
+              src={team.coverPhotoUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(120deg, ${team.primaryColor}F2 0%, ${team.primaryColor}99 45%, rgba(10,10,10,0.55) 100%)`,
+              }}
+            />
+          </>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(120deg, ${team.primaryColor} 0%, ${team.primaryColor}DD 60%, #0A0A0A 100%)`,
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-[radial-gradient(rgba(250,250,247,0.04)_1px,transparent_1px)] bg-[length:6px_6px]" />
 
         <div className="relative px-2 sm:px-12 py-12 sm:py-16">

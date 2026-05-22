@@ -20,6 +20,7 @@ export const updateTeamSchema = z.object({
   instagramHandle: z.string().nullable().optional(),
   logoUrl: z.string().url().nullable().optional(),
   logoSvgUrl: z.string().url().nullable().optional(),
+  coverPhotoUrl: z.string().url().nullable().optional(),
   primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
 });

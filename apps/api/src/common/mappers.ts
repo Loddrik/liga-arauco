@@ -10,6 +10,7 @@ export function mapTeam(t: Team): TeamDto {
     instagramHandle: t.instagramHandle,
     logoUrl: t.logoUrl,
     logoSvgUrl: t.logoSvgUrl,
+    coverPhotoUrl: t.coverPhotoUrl,
     primaryColor: t.primaryColor,
     secondaryColor: t.secondaryColor,
   };

@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 const CL = '-04:00';
 
 const teams = [
-  { slug: 'basket-arauco', name: 'BasketArauco', shortName: 'BAS', instagramHandle: 'basket_arauco', primaryColor: '#1A4D8F' },
-  { slug: 'buffalos',      name: 'Buffalos',     shortName: 'BUF', instagramHandle: 'buffalos.basquet', primaryColor: '#7A2A2A' },
-  { slug: 'huillines',     name: 'Huillines',    shortName: 'HUI', instagramHandle: 'cdhuillines',     primaryColor: '#0E6B3A' },
-  { slug: 'navidad',       name: 'Navidad',      shortName: 'NAV', instagramHandle: null,              primaryColor: '#C0392B' },
-  { slug: 'ragko',         name: 'Ragko',        shortName: 'RAG', instagramHandle: 'atletico_ragko',  primaryColor: '#1B1B1B' },
-  { slug: 'laraquete',     name: 'Laraquete',    shortName: 'LAR', instagramHandle: null,              primaryColor: '#1F5B8A' },
-  { slug: 'lafken',        name: 'Lafken',       shortName: 'LAF', instagramHandle: null,              primaryColor: '#2E86AB' },
-  { slug: 'lautaro',       name: 'Lautaro',      shortName: 'LAU', instagramHandle: null,              primaryColor: '#B8860B' },
+  { slug: 'basket-arauco', name: 'BasketArauco', shortName: 'BAS', instagramHandle: 'basket_arauco',  primaryColor: '#1A4D8F', coverPhotoUrl: '/teams/basket-arauco-cover.jpg' },
+  { slug: 'buffalos',      name: 'Buffalos',     shortName: 'BUF', instagramHandle: 'buffalos.basquet', primaryColor: '#7A2A2A', coverPhotoUrl: '/teams/buffalos-cover.jpg' },
+  { slug: 'huillines',     name: 'Huillines',    shortName: 'HUI', instagramHandle: 'cdhuillines',     primaryColor: '#0E6B3A', coverPhotoUrl: null },
+  { slug: 'navidad',       name: 'Navidad',      shortName: 'NAV', instagramHandle: null,              primaryColor: '#C0392B', coverPhotoUrl: '/teams/navidad-cover.jpg' },
+  { slug: 'ragko',         name: 'Ragko',        shortName: 'RAG', instagramHandle: 'atletico_ragko',  primaryColor: '#1B1B1B', coverPhotoUrl: '/teams/ragko-cover.jpg' },
+  { slug: 'laraquete',     name: 'Laraquete',    shortName: 'LAR', instagramHandle: null,              primaryColor: '#1F5B8A', coverPhotoUrl: '/teams/laraquete-cover.jpg' },
+  { slug: 'lafken',        name: 'Lafken',       shortName: 'LAF', instagramHandle: null,              primaryColor: '#2E86AB', coverPhotoUrl: '/teams/lafken-cover.jpg' },
+  { slug: 'lautaro',       name: 'Lautaro',      shortName: 'LAU', instagramHandle: null,              primaryColor: '#B8860B', coverPhotoUrl: '/teams/lautaro-cover.jpg' },
 ];
 
 const rounds = [

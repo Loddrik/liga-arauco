@@ -33,6 +33,7 @@ model Team {
   instagramHandle String?
   logoUrl         String?
   logoSvgUrl      String?
+  coverPhotoUrl   String?
   primaryColor    String  @default("#0F2A4A")
   secondaryColor  String?
 
