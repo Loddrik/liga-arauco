@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -14,7 +15,12 @@ import { StandingsService } from '../standings/standings.service';
 import { MatchesService } from '../matches/matches.service';
 import { NmService } from '../nm/nm.service';
 import { ZodValidationPipe } from '../common/zod.pipe';
-import { updateMatchSchema, type UpdateMatchInput } from '@liga/shared';
+import {
+  updateMatchSchema,
+  upsertMatchStatsSchema,
+  type UpdateMatchInput,
+  type UpsertMatchStatsInput,
+} from '@liga/shared';
 import { mapMatch } from '../common/mappers';
 
 @Controller('admin/matches')
@@ -67,6 +73,20 @@ export class AdminMatchesController {
     this.matches.fireSyncMatch(updated);
 
     return mapMatch(updated);
+  }
+
+  @Get(':id/stats')
+  getStats(@Param('id') id: string) {
+    return this.matches.getMatchStats(id);
+  }
+
+  @Put(':id/stats')
+  async upsertStats(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(upsertMatchStatsSchema))
+    body: UpsertMatchStatsInput,
+  ) {
+    return this.matches.upsertMatchStats(id, body);
   }
 
   /**

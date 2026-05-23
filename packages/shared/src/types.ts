@@ -61,3 +61,34 @@ export interface PlayerAdminDto extends PlayerPublicDto {
   rut: string;
   teamId: string;
 }
+
+/** Parcial de un período (cuarto u OT) de un partido. */
+export interface MatchPeriodDto {
+  period: number; // 1..4 = cuartos; 5+ = OT
+  homePoints: number;
+  awayPoints: number;
+  homeTeamFouls: number;
+  awayTeamFouls: number;
+  homeTimeouts: number;
+  awayTimeouts: number;
+}
+
+/** Stats de un jugador en un partido (puede no haber jugado: played=false). */
+export interface MatchPlayerStatDto {
+  player: PlayerPublicDto;
+  teamId: string;
+  played: boolean;
+  points: number;
+  fouls: number;
+  fouledOut: boolean; // derivado: fouls >= 5
+}
+
+/** Bundle de estadísticas de un partido. */
+export interface MatchStatsDto {
+  matchId: string;
+  periods: MatchPeriodDto[];
+  // Stats por equipo, cada array incluye TODO el roster
+  // (jugaron o no). Ordenados por jersey luego nombre.
+  homePlayers: MatchPlayerStatDto[];
+  awayPlayers: MatchPlayerStatDto[];
+}

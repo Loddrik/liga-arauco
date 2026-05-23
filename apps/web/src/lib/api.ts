@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type {
   TeamDto,
   MatchDto,
+  MatchStatsDto,
   RoundDto,
   StandingRowDto,
   PlayerPublicDto,
@@ -52,5 +53,13 @@ export function useTeamRoster(slug: string) {
     queryKey: ['teams', slug, 'players'],
     queryFn: () => get<PlayerPublicDto[]>(`/teams/${slug}/players`),
     enabled: !!slug,
+  });
+}
+
+export function useMatchStats(matchId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['matches', matchId, 'stats'],
+    queryFn: () => get<MatchStatsDto>(`/matches/${matchId}/stats`),
+    enabled: !!matchId && enabled,
   });
 }

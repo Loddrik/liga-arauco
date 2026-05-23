@@ -3,6 +3,7 @@ import type { MatchDto } from '@liga/shared';
 import { useRounds } from '@/lib/api';
 import { TeamBadge } from '@/components/TeamBadge';
 import { MatchPhotosSection } from '@/components/match/MatchPhotosSection';
+import { MatchStatsSection } from '@/components/match/MatchStatsSection';
 import { cn } from '@/lib/cn';
 import { matchTimeOrTbd } from '@/lib/match-time';
 
@@ -91,6 +92,14 @@ export default function MatchDetail() {
           </p>
         )}
       </section>
+
+      {played && (
+        <MatchStatsSection
+          matchId={match.id}
+          homeTeam={match.homeTeam}
+          awayTeam={match.awayTeam}
+        />
+      )}
 
       <MatchPhotosSection matchId={match.id} />
     </div>

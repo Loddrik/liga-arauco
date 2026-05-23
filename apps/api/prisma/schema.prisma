@@ -57,6 +57,8 @@ model Player {
   jersey   Int?
   position String?
 
+  matchStats MatchPlayerStat[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -105,12 +107,58 @@ model Match {
   nmEventSlug String?   @map("nm_event_slug")
   nmSyncedAt  DateTime? @map("nm_synced_at")
 
+  periods     MatchPeriod[]
+  playerStats MatchPlayerStat[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([roundId])
   @@index([scheduledAt])
   @@index([nmEventId])
+}
+
+// Stats por período (cuartos + OT) del partido. Reglas:
+// - period 1..4 = cuartos regulares; 5+ = tiempos extra (OT1=5, OT2=6, ...)
+// - homePoints/awayPoints son los puntos anotados EN ese período (parcial),
+//   no acumulados. El total del partido se calcula sumando todos los períodos
+//   y se persiste en Match.homeScore/Match.awayScore.
+// - homeTeamFouls/awayTeamFouls son faltas colectivas (no individuales).
+model MatchPeriod {
+  id      String @id @default(cuid())
+  matchId String
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  period         Int
+  homePoints     Int
+  awayPoints     Int
+  homeTeamFouls  Int @default(0)
+  awayTeamFouls  Int @default(0)
+  homeTimeouts   Int @default(0)
+  awayTimeouts   Int @default(0)
+
+  @@unique([matchId, period])
+  @@index([matchId])
+}
+
+// Estadísticas por jugador en un partido. Un row por jugador del roster que
+// participó O cuyo total se quiere guardar. Si played=false con points=0 y
+// fouls=0, el jugador estuvo en banca sin entrar.
+model MatchPlayerStat {
+  id      String @id @default(cuid())
+  matchId String
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  playerId String
+  player   Player @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  teamId   String
+
+  played Boolean @default(false)
+  points Int     @default(0)
+  fouls  Int     @default(0)
+
+  @@unique([matchId, playerId])
+  @@index([matchId, teamId])
 }
 
 model AdminUser {

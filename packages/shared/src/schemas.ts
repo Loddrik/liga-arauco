@@ -47,3 +47,26 @@ export type CreatePlayerInput = z.infer<typeof createPlayerSchema>;
 
 export const updatePlayerSchema = createPlayerSchema.partial();
 export type UpdatePlayerInput = z.infer<typeof updatePlayerSchema>;
+
+const periodInputSchema = z.object({
+  period: z.number().int().min(1).max(10),
+  homePoints: z.number().int().min(0).max(200),
+  awayPoints: z.number().int().min(0).max(200),
+  homeTeamFouls: z.number().int().min(0).max(99).default(0),
+  awayTeamFouls: z.number().int().min(0).max(99).default(0),
+  homeTimeouts: z.number().int().min(0).max(99).default(0),
+  awayTimeouts: z.number().int().min(0).max(99).default(0),
+});
+
+const playerStatInputSchema = z.object({
+  playerId: z.string().min(1),
+  played: z.boolean(),
+  points: z.number().int().min(0).max(200),
+  fouls: z.number().int().min(0).max(5),
+});
+
+export const upsertMatchStatsSchema = z.object({
+  periods: z.array(periodInputSchema).max(10),
+  playerStats: z.array(playerStatInputSchema).max(60),
+});
+export type UpsertMatchStatsInput = z.infer<typeof upsertMatchStatsSchema>;

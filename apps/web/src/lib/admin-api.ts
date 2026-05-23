@@ -1,12 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   MatchDto,
+  MatchStatsDto,
   TeamDto,
   UpdateMatchInput,
   UpdateTeamInput,
   PlayerAdminDto,
   CreatePlayerInput,
   UpdatePlayerInput,
+  UpsertMatchStatsInput,
 } from '@liga/shared';
 import { http } from './http';
 
@@ -35,6 +37,34 @@ export function useUpdateMatch() {
       qc.invalidateQueries({ queryKey: ['matches'] });
       qc.invalidateQueries({ queryKey: ['standings'] });
       qc.invalidateQueries({ queryKey: ['teams'] });
+    },
+  });
+}
+
+export function useMatchStats(matchId: string) {
+  return useQuery({
+    queryKey: ['admin', 'matches', matchId, 'stats'],
+    queryFn: () => get<MatchStatsDto>(`/admin/matches/${matchId}/stats`),
+    enabled: !!matchId,
+  });
+}
+
+export function useUpsertMatchStats(matchId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: UpsertMatchStatsInput) => {
+      const { data } = await http.put<MatchStatsDto>(
+        `/admin/matches/${matchId}/stats`,
+        input,
+      );
+      return data;
+    },
+    onSuccess: data => {
+      qc.setQueryData(['admin', 'matches', matchId, 'stats'], data);
+      qc.invalidateQueries({ queryKey: ['admin', 'matches'] });
+      qc.invalidateQueries({ queryKey: ['rounds'] });
+      qc.invalidateQueries({ queryKey: ['matches'] });
+      qc.invalidateQueries({ queryKey: ['standings'] });
     },
   });
 }

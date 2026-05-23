@@ -1,9 +1,23 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Match } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { mapMatch } from '../common/mappers';
+import {
+  buildPlayerStatRows,
+  mapMatch,
+  mapMatchPeriod,
+} from '../common/mappers';
 import { NmService } from '../nm/nm.service';
-import type { MatchDto } from '@liga/shared';
+import { StandingsService } from '../standings/standings.service';
+import type {
+  MatchDto,
+  MatchStatsDto,
+  UpsertMatchStatsInput,
+} from '@liga/shared';
 
 @Injectable()
 export class MatchesService {
@@ -12,6 +26,7 @@ export class MatchesService {
   constructor(
     private prisma: PrismaService,
     private nm: NmService,
+    private standings: StandingsService,
   ) {}
 
   async upcoming(limit = 3): Promise<MatchDto[]> {
@@ -155,6 +170,147 @@ export class MatchesService {
         `syncMatch background falló para match ${match.id}: ${err instanceof Error ? err.message : String(err)}`,
       );
     });
+  }
+
+  /**
+   * Lee las stats de un partido. Para cada equipo devuelve el roster completo
+   * (jugaron o no) para que el admin pueda editar a cualquier jugador sin
+   * tener que diferenciar entre "tiene row" y "no tiene row".
+   */
+  async getMatchStats(matchId: string): Promise<MatchStatsDto> {
+    const match = await this.prisma.match.findUnique({
+      where: { id: matchId },
+      select: { id: true, homeTeamId: true, awayTeamId: true },
+    });
+    if (!match) throw new NotFoundException(`match "${matchId}" not found`);
+    if (!match.homeTeamId || !match.awayTeamId) {
+      throw new BadRequestException(
+        'No se pueden cargar stats si el partido no tiene ambos equipos asignados.',
+      );
+    }
+
+    const [periods, stats, homeRoster, awayRoster] = await Promise.all([
+      this.prisma.matchPeriod.findMany({
+        where: { matchId },
+        orderBy: { period: 'asc' },
+      }),
+      this.prisma.matchPlayerStat.findMany({ where: { matchId } }),
+      this.prisma.player.findMany({
+        where: { teamId: match.homeTeamId },
+        orderBy: [{ jersey: 'asc' }, { name: 'asc' }],
+      }),
+      this.prisma.player.findMany({
+        where: { teamId: match.awayTeamId },
+        orderBy: [{ jersey: 'asc' }, { name: 'asc' }],
+      }),
+    ]);
+
+    return {
+      matchId,
+      periods: periods.map(mapMatchPeriod),
+      homePlayers: buildPlayerStatRows(homeRoster, stats),
+      awayPlayers: buildPlayerStatRows(awayRoster, stats),
+    };
+  }
+
+  /**
+   * Upsert masivo de stats del partido. Reemplaza períodos y stats por jugador
+   * con los del payload (delete + create en transacción).
+   *
+   * Side effects:
+   * - Recalcula Match.homeScore/awayScore a partir de la suma de períodos.
+   * - Si hay períodos, marca Match.status='PLAYED'.
+   * - Invalida cache de standings.
+   *
+   * Valida que cada playerStat.playerId pertenezca al roster de uno de los
+   * dos equipos del partido (anti-data-corruption).
+   */
+  async upsertMatchStats(
+    matchId: string,
+    input: UpsertMatchStatsInput,
+  ): Promise<MatchStatsDto> {
+    const match = await this.prisma.match.findUnique({
+      where: { id: matchId },
+      select: { id: true, homeTeamId: true, awayTeamId: true },
+    });
+    if (!match) throw new NotFoundException(`match "${matchId}" not found`);
+    if (!match.homeTeamId || !match.awayTeamId) {
+      throw new BadRequestException(
+        'No se pueden cargar stats si el partido no tiene ambos equipos asignados.',
+      );
+    }
+
+    // Validar que los playerIds pertenezcan a alguno de los dos rosters.
+    const playerIds = input.playerStats.map(p => p.playerId);
+    if (playerIds.length > 0) {
+      const validPlayers = await this.prisma.player.findMany({
+        where: {
+          id: { in: playerIds },
+          teamId: { in: [match.homeTeamId, match.awayTeamId] },
+        },
+        select: { id: true, teamId: true },
+      });
+      if (validPlayers.length !== new Set(playerIds).size) {
+        throw new BadRequestException(
+          'Algún jugador del payload no pertenece al roster de los equipos del partido.',
+        );
+      }
+    }
+
+    // Mapa playerId -> teamId para denormalizar al insertar.
+    const teamByPlayerId = new Map<string, string>();
+    if (playerIds.length > 0) {
+      const players = await this.prisma.player.findMany({
+        where: { id: { in: playerIds } },
+        select: { id: true, teamId: true },
+      });
+      for (const p of players) teamByPlayerId.set(p.id, p.teamId);
+    }
+
+    const totals = input.periods.reduce(
+      (acc, p) => ({
+        home: acc.home + p.homePoints,
+        away: acc.away + p.awayPoints,
+      }),
+      { home: 0, away: 0 },
+    );
+
+    await this.prisma.$transaction([
+      this.prisma.matchPeriod.deleteMany({ where: { matchId } }),
+      this.prisma.matchPlayerStat.deleteMany({ where: { matchId } }),
+      ...(input.periods.length > 0
+        ? [
+            this.prisma.matchPeriod.createMany({
+              data: input.periods.map(p => ({ matchId, ...p })),
+            }),
+          ]
+        : []),
+      ...(input.playerStats.length > 0
+        ? [
+            this.prisma.matchPlayerStat.createMany({
+              data: input.playerStats.map(s => ({
+                matchId,
+                playerId: s.playerId,
+                teamId: teamByPlayerId.get(s.playerId)!,
+                played: s.played,
+                points: s.points,
+                fouls: s.fouls,
+              })),
+            }),
+          ]
+        : []),
+      this.prisma.match.update({
+        where: { id: matchId },
+        data: {
+          homeScore: input.periods.length > 0 ? totals.home : null,
+          awayScore: input.periods.length > 0 ? totals.away : null,
+          ...(input.periods.length > 0 ? { status: 'PLAYED' as const } : {}),
+        },
+      }),
+    ]);
+
+    this.standings.invalidate();
+    return this.getMatchStats(matchId);
   }
 }
 

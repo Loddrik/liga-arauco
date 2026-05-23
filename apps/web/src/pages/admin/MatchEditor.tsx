@@ -4,6 +4,7 @@ import { useAdminMatches, useUpdateMatch } from '@/lib/admin-api';
 import type { MatchStatus, UpdateMatchInput } from '@liga/shared';
 import { TeamBadge } from '@/components/TeamBadge';
 import { isTimeTbd } from '@/lib/match-time';
+import MatchStatsForm from './MatchStatsForm';
 
 function formatScheduledForAdmin(iso: string) {
   const d = new Date(iso);
@@ -65,15 +66,17 @@ export default function MatchEditor() {
   const home = match.homeTeam?.name ?? match.homePlaceholder ?? 'TBD';
   const away = match.awayTeam?.name ?? match.awayPlaceholder ?? 'TBD';
 
+  const canEditStats = !!match.homeTeam && !!match.awayTeam;
+
   return (
-    <div className="space-y-4 max-w-xl mx-auto">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <Link to="/admin" className="text-sm text-brand hover:underline">← Volver al listado</Link>
       <header>
         <h1 className="text-2xl font-bold text-brand">Editar partido #{match.number}</h1>
         <p className="text-sm text-slate-500">Fecha {match.roundNumber} · {formatScheduledForAdmin(match.scheduledAt)}</p>
       </header>
 
-      <form onSubmit={onSubmit} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 space-y-5">
+      <form onSubmit={onSubmit} className="bg-white rounded-lg border border-slate-200 shadow-sm p-5 space-y-5 max-w-xl mx-auto">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <div className="flex flex-col items-center gap-2">
             <TeamBadge team={match.homeTeam} placeholder={match.homePlaceholder} size="lg" />
@@ -148,6 +151,19 @@ export default function MatchEditor() {
           </Link>
         </div>
       </form>
+
+      {canEditStats ? (
+        <MatchStatsForm
+          matchId={id}
+          homeTeamName={match.homeTeam!.shortName || match.homeTeam!.name}
+          awayTeamName={match.awayTeam!.shortName || match.awayTeam!.name}
+        />
+      ) : (
+        <p className="text-sm text-slate-500 italic max-w-xl mx-auto">
+          Las estadísticas se habilitan cuando ambos equipos están asignados
+          (no disponible para llaves de playoff sin definir).
+        </p>
+      )}
     </div>
   );
 }

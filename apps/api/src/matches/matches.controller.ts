@@ -37,6 +37,17 @@ export class MatchesController {
   }
 
   /**
+   * Stats públicas (box score + parciales) del partido. La página de detalle
+   * lo llama después de cargar los datos básicos del partido (que vienen del
+   * cache de useRounds). Si no hay stats cargadas todavía, devuelve arrays
+   * vacíos — el frontend cae al render solo de marcador final.
+   */
+  @Get(':id/stats')
+  stats(@Param('id') id: string) {
+    return this.matches.getMatchStats(id);
+  }
+
+  /**
    * Stream-ea un PNG del QR del partido (apunta al evento público en NM).
    * Pensado para imprimir y pegar en cancha el día del partido.
    */
